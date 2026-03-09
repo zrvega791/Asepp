@@ -3,7 +3,7 @@
 define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
 define('DB_PORT', getenv('DB_PORT') ?: '3306');
 define('DB_USER', getenv('DB_USER') ?: 'root');
-define('DB_PASS', getenv('DB_PASS') ?: '');
+define('DB_PASS', getenv('DB_PASSWORD') ?: (getenv('DB_PASS') ?: '')); 
 define('DB_NAME', getenv('DB_NAME') ?: 'ukk_peminjaman_alat_asep');
 
 class Database {
@@ -20,17 +20,15 @@ class Database {
                 PDO::ATTR_EMULATE_PREPARES => false,
             ];
 
-            // Jika di hosting (Production), tambahkan SSL jika diperlukan
+            // Aiven memerlukan SSL (berdasarkan screenshot Anda)
             if (getenv('DB_HOST')) {
-                // Aiven MySQL biasanya memerlukan SSL, namun bisa dicoba tanpa SSL dulu 
-                // Jika masih gagal, tambahkan: PDO::MYSQL_ATTR_SSL_CA => '/path/to/ca.pem'
+                $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
             }
 
             $this->conn = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch (PDOException $e) {
-            // Tampilkan pesan error yang lebih jelas di Vercel Logs
             error_log("Database Connection Error: " . $e->getMessage());
-            die("Maaf, koneksi ke database sedang mengalami gangguan (Timeout). Pastikan IP Vercel tidak diblokir oleh Provider Database (Aiven/Railway).");
+            die("Koneksi Database Gagal. Pesan: " . $e->getMessage());
         }
     }
 
