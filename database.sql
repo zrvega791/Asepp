@@ -1,7 +1,6 @@
--- Database: ukk_peminjaman_alat_asep
-DROP DATABASE IF EXISTS ukk_peminjaman_alat_asep;
-CREATE DATABASE ukk_peminjaman_alat_asep;
-USE ukk_peminjaman_alat_asep;
+-- Database Structure for UKK Peminjaman Alat
+-- Run this script on your pre-selected database in HeidiSQL
+
 
 -- ==========================================================
 -- 1. TABEL STRUKTUR

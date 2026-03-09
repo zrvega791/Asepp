@@ -1,6 +1,7 @@
 <?php
 // Database Configuration
 define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+define('DB_PORT', getenv('DB_PORT') ?: '3306');
 define('DB_USER', getenv('DB_USER') ?: 'root');
 define('DB_PASS', getenv('DB_PASS') ?: '');
 define('DB_NAME', getenv('DB_NAME') ?: 'ukk_peminjaman_alat_asep');
@@ -11,14 +12,25 @@ class Database {
 
     private function __construct() {
         try {
-            $this->conn = new PDO(
-                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
-                DB_USER,
-                DB_PASS,
-                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-            );
+            $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+            
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+            ];
+
+            // Jika di hosting (Production), tambahkan SSL jika diperlukan
+            if (getenv('DB_HOST')) {
+                // Aiven MySQL biasanya memerlukan SSL, namun bisa dicoba tanpa SSL dulu 
+                // Jika masih gagal, tambahkan: PDO::MYSQL_ATTR_SSL_CA => '/path/to/ca.pem'
+            }
+
+            $this->conn = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch (PDOException $e) {
-            die("Connection failed: " . $e->getMessage());
+            // Tampilkan pesan error yang lebih jelas di Vercel Logs
+            error_log("Database Connection Error: " . $e->getMessage());
+            die("Maaf, koneksi ke database sedang mengalami gangguan (Timeout). Pastikan IP Vercel tidak diblokir oleh Provider Database (Aiven/Railway).");
         }
     }
 
