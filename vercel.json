@@ -7,7 +7,7 @@
   "routes": [
     {
       "src": "/public/(.*)",
-      "handle": "filesystem"
+      "dest": "/public/$1"
     },
     {
       "src": "/(.*)",
